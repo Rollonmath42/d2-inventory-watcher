@@ -39,7 +39,7 @@ function set_wish_list(event) {
         watch_list.removeChild(watch_list.lastChild);
     }
 
-    item_screenshot.src = "";
+    item_screenshot.src = "./no_item.jpg";
     item_screenshot.screenshot = "";
     item_screenshot.hash = 0;
 
@@ -94,7 +94,7 @@ function remove_current_item() {
         }
     }
 
-    item_screenshot.src = "";
+    item_screenshot.src = "./no_item.jpg";
     item_screenshot.screenshot = "";
     item_screenshot.hash = 0;
     item_screenshot.index = -1;
@@ -155,7 +155,7 @@ function display_item(item, from_watch_list, watch_list_unique_index) {
         perk_list.removeChild(perk_list.lastChild);
     }
 
-    item_screenshot.src = `https://www.bungie.net${item.screenshot}`;
+    item_screenshot.src = "https://www.bungie.net" + item.screenshot;
     item_screenshot.screenshot = item.screenshot;
     item_screenshot.hash = item.hash;
 
@@ -214,7 +214,7 @@ function process_perk_column(perk_set, column) {
         perk_img.src = `https://bungie.net${perk.displayProperties.icon}`;
         perk_img.style.gridColumn = column + 1;
         perk_img.style.gridRow = i + 1;
-        perk_img.style.maxWidth = "100%";
+        perk_img.style.transform = "scale(50%, 50%) translate(-50%, -50%)";
         perk_img.info = perk;
         perk_img.title = perk.displayProperties.name + "\n" + perk.displayProperties.description;
         perk_img.addEventListener("click", () => {

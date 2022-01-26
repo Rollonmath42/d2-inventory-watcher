@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="search_section" class="search_section">
-    <input type="text" id="search_box" placeholder="Search...">
-    <ul id="search_results"></ul>
+  <div id="item_result" class="result_section">
+    <img id="item_screenshot" class="item_screenshot" src="./no_item.jpg">
+    <div id="perk_list" class="perk_list"></div>
   </div>
   <div id="control_panel" class="control_panel">
     <input type="file" accept="application/json" id="import_json">
@@ -18,14 +18,14 @@
       <input type="text" id="export_name" placeholder="Enter file name here...">
     </div>
     <button id="remove_current_item">Remove Current Item</button>
+    <div id="watch_list_container">
+      <h1 id="watch_list_title">Watch List</h1>
+      <ul id="watch_list" class="watch_list"></ul>
+    </div>
   </div>
-  <div id="item_result">
-    <img id="item_screenshot" class="item_result item_screenshot" src="">
-    <div id="perk_list" class="item_result perk_list"></div>
-  </div>
-  <div id="watch_list_container" class="watch_list">
-    <p id="watch_list_title">Watch List</p>
-    <div id="watch_list"></div>
+  <div id="search_section" class="search_section">
+    <input type="text" id="search_box" placeholder="Search...">
+    <ul id="search_results"></ul>
   </div>
   <script src="js/index.js"></script>
 </body>
