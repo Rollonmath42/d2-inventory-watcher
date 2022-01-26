@@ -31,10 +31,9 @@ p {
 .control_panel {
 	grid-column: 3;
 	grid-row: 1;
-	display: grid;
+	display: flex;
+	flex-wrap: wrap;
 	gap: 0.5em;
-	grid-template-columns: 0.4fr 0.5fr;
-	grid-template-rows: repeat(3, 0.5fr);
 }
 .search_section {
 	grid-column: 4;
