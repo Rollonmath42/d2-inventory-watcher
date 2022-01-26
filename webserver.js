@@ -5,6 +5,7 @@ const LISTEN_PORT = process.env.PORT || 80;
 const weapon_db_init = require("./weapon_db_init");
 const cors = require('cors');
 const fs = require('fs');
+var favicon = require('serve-favicon');
 
 app.use("/css", express.static(__dirname + "/css"));
 app.use("/js", express.static(__dirname + "/js"));
@@ -12,7 +13,10 @@ app.use("/", express.static(__dirname + "/"));
 
 app.use(cors());
 
-app.get("/", (request, res) => {
+app.get("/favicon.ico", (req, res) => res.sendFile("favicon.ico"));
+
+
+app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "index.html"));
 });
 
