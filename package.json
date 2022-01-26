@@ -1,0 +1,21 @@
+{
+  "name": "d2inventoryscrape",
+  "version": "1.0.0",
+  "description": "",
+  "main": "inventory_watcher.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Carlos M",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "discord.js": "^13.6.0",
+    "dotenv": "^14.2.0",
+    "express": "^4.17.2",
+    "extract-zip": "^2.0.1",
+    "path": "^0.12.7",
+    "request": "^2.88.2",
+    "sqlite3": "^5.0.2"
+  }
+}
