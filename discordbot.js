@@ -1,32 +1,14 @@
 // Require the necessary discord.js classes
 const { Client, Intents, Guild, Interaction, Message, MessageEmbed } = require("discord.js");
 const request = require('request');
+const { check_manifest } = require("./get_manifest_and_build");
 require("dotenv").config();
+
+const bungie_base_url = "https://www.bungie.net";
+const api_headers = {"X-API-Key" : process.env.API_KEY};
 
 const inventory_watcher = require("./inventory_watcher");
 let watcher_dictionary = {};
-
-const its_me = {
-    membership: "3",
-    profile_id: "4611686018468393987",
-    postmaster: {
-        "2305843009394751671" : {
-            first_postmaster_notify: false,
-            second_postmaster_notify: false,
-            count: 0
-        },
-        "2305843009432475159" : {
-            first_postmaster_notify: false,
-            second_postmaster_notify: false,
-            count: 0
-        },
-        "2305843009764984617" : {
-            first_postmaster_notify: false,
-            second_postmaster_notify: false,
-            count: 0
-        }
-    }
-}
 
 // Create a new client instance
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_PRESENCES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });
@@ -42,23 +24,73 @@ client.on("messageCreate", (message) => {
     if(message.author.bot) {
         return;
     }
+
     if(message.attachments.size == 1) {
         handle_user_message(message);
     }
-});
 
-function handle_user_message(message) {
-    if(watcher_dictionary[message.author.id] == undefined) {
-        request({ url: message.attachments.at(0).attachment }, (error, response, body) => {
-            if(error) {
-                throw error;
+    if(message.content.includes("/")) {
+        let bungie_id = message.content.split("/");
+        request({ url: bungie_base_url + `/Platform/Destiny2/${bungie_id[0]}/Profile/${bungie_id[1]}/?components=Characters`,
+        headers: api_headers}, (error, response, body) => {
+            if(!error) {
+                process_character_info(message, body, bungie_id);
+                return;
             }
 
-            watcher_dictionary[message.author.id] = new inventory_watcher.inventory_watcher_class(JSON.parse(body), message.author.id, its_me);
-            watcher_dictionary[message.author.id].start_watcher_loop(watcher_dictionary[message.author.id]);
+            console.log(error);
         });
+    }
+});
 
+async function process_character_info(message, body, bungie_id) {
+    let response = JSON.parse(body);
+    if(response.ErrorCode != 1) {
+        simple_message(`From Bungie: ${response.Response}`, message.author.id);
         return;
+    }
+
+    let characters = response.Response.characters.data;
+
+    let bungie_profile = {
+        membership: bungie_id[0],
+        profile_id: bungie_id[1],
+        postmaster: {}
+    };
+
+    let keys = Object.keys(characters);
+
+    for(let i = 0; i < keys.length; i++) {
+        bungie_profile.postmaster[keys[i]] = {
+            first_postmaster_notify: false,
+            second_postmaster_notify: false,
+            count: 0
+        };
+    }
+
+    if(watcher_dictionary[message.author.id] == undefined) {
+        watcher_dictionary[message.author.id] = {
+            bungie_profile: bungie_profile,
+            watcher: undefined,
+            watch_list: undefined
+        };
+
+        simple_message("Successfully registered that Bungie ID", message.author.id);
+        return;
+    }
+
+    watcher_dictionary[message.author.id].bungie_profile = bungie_profile;
+    simple_message("Successfully registered that Bungie ID", message.author.id);
+    check_watcher_definition(message.author.id);
+}
+
+async function handle_user_message(message) {
+    if(watcher_dictionary[message.author.id] == undefined) {
+        watcher_dictionary[message.author.id] = {
+            bungie_profile: undefined,
+            watcher: undefined,
+            watch_list: undefined
+        };
     }
 
     request({ url: message.attachments.at(0).attachment }, (error, response, body) => {
@@ -66,8 +98,35 @@ function handle_user_message(message) {
             throw error;
         }
 
-        watcher_dictionary[message.author.id].update_watch_list(JSON.parse(body));
+        watcher_dictionary[message.author.id].watch_list = JSON.parse(body);
+        simple_message("Successfully added that watch list", message.author.id);
+        check_watcher_definition(message.author.id);
     });
+}
+
+function check_watcher_definition(user_id) {
+    if(watcher_dictionary[user_id].watch_list == undefined
+            || watcher_dictionary[user_id].bungie_profile == undefined) {
+        return;
+    }
+
+    if(watcher_dictionary[user_id].watcher == undefined) {
+        watcher_dictionary[user_id].watcher = 
+            new inventory_watcher.inventory_watcher_class(watcher_dictionary[user_id].watch_list, user_id, watcher_dictionary[user_id].bungie_profile);
+        watcher_dictionary[user_id].watcher.start_watcher_loop(watcher_dictionary[user_id].watcher);
+
+        simple_message("Initializing watcher", user_id);
+        return;
+    }
+
+    watcher_dictionary[user_id].watcher.update_watch_list(watcher_dictionary[user_id].watch_list);
+    watcher_dictionary[user_id].watcher.update_bungie_profile(watcher_dictionary[user_id].bungie_profile);
+    simple_message("Updated watcher information", user_id);
+}
+
+async function simple_message(message, user_id) {
+    const user = await client.users.fetch(user_id);
+    user.send(message);
 }
 
 async function postmaster_warning(message, user_id) {

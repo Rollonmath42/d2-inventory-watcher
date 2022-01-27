@@ -11,7 +11,6 @@ class inventory_watcher_class {
         this.watch_list = watch_list;
         this.discord_id = discord_id;
         this.bungie_profile = bungie_profile;
-        this.continue_watching = true;
         this.first_watch = true;
         this.seen_items = [];
     }
@@ -23,6 +22,12 @@ class inventory_watcher_class {
 
     update_watch_list(watch_list) {
         this.watch_list = watch_list;
+        this.first_watch = true;
+        this.seen_items = [];
+    }
+
+    update_bungie_profile(bungie_profile) {
+        this.bungie_profile = bungie_profile;
         this.first_watch = true;
         this.seen_items = [];
     }
