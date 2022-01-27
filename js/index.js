@@ -208,12 +208,16 @@ function display_perks(response) {
 }
 
 function process_perk_column(perk_set, column) {
+    let proper_count = 0;
     for(let i = 0; i < perk_set.length; i++) {
+        if(!perk_set[i].currentlyCanRoll) {
+            continue;
+        }
         let perk = weapon_and_perk_db.find(perk => perk.hash == perk_set[i].plugItemHash);
         let perk_img = document.createElement("img");
         perk_img.src = `https://bungie.net${perk.displayProperties.icon}`;
         perk_img.style.gridColumn = column + 1;
-        perk_img.style.gridRow = i + 1;
+        perk_img.style.gridRow = proper_count + 1;
         perk_img.style.transform = "scale(50%, 50%) translate(-50%, -50%)";
         perk_img.info = perk;
         perk_img.title = perk.displayProperties.name + "\n" + perk.displayProperties.description;
@@ -222,6 +226,7 @@ function process_perk_column(perk_set, column) {
         });
         perk_list.appendChild(perk_img);
         set_perk_background(perk_img, column);
+        proper_count++;
     }
 }
 
