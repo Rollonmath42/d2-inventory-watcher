@@ -214,6 +214,10 @@ function process_perk_column(perk_set, column) {
             continue;
         }
         let perk = weapon_and_perk_db.find(perk => perk.hash == perk_set[i].plugItemHash);
+        if(perk == undefined) {
+            console.log("Hey, if you see this, DM Rollon#1111 on Discord this: " + perk_set[i].plugItemHash);
+            continue;
+        }
         let perk_img = document.createElement("img");
         perk_img.src = `https://bungie.net${perk.displayProperties.icon}`;
         perk_img.style.gridColumn = column + 1;

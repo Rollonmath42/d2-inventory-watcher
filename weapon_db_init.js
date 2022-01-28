@@ -1,14 +1,22 @@
 //This returns all weapons AND perks/traits
 const manifest = require("./get_manifest_and_build");
 const fs = require('fs');
-
+/* old
 const weapon_and_perk_bucket_hashes = [
     953998645, //power
     1498876634, //kinetic
     2465295065, //energy
     1469714392 //perk
+]*/
+const weapon_and_perk_bucket_hashes = [
+    2, //kinetic
+    3, //energy
+    4, //power
+    610365472 //perk
 ]
-
+/*
+item categories 1 weapon 2 kinetic 3 energy 4 power 3708671066 perks
+*/
 var webserver_startup;
 
 function weapon_db_startup(server_startup) {
@@ -25,13 +33,24 @@ function weapon_db_runtime() {
         let item = item_db[i];
         let itemJson = JSON.parse(item.json);
 
-        if(itemJson.inventory == undefined || itemJson.inventory.bucketTypeHash == undefined) {
+        if(itemJson.itemCategoryHashes == undefined) {
             continue;
         }
 
-        if(!weapon_and_perk_bucket_hashes.includes(itemJson.inventory.bucketTypeHash)) {
+        let match_count = 0;
+        for(let j = 0; j < itemJson.itemCategoryHashes.length; j++) {
+            if(weapon_and_perk_bucket_hashes.includes(itemJson.itemCategoryHashes[j])) {
+                match_count++;
+            }
+        }
+
+        if(match_count == 0) {
             continue;
         }
+
+        /*if(!weapon_and_perk_bucket_hashes.includes(itemJson.inventory.bucketTypeHash)) {
+            continue;
+        }*/
 
         weapons.push(itemJson);
     }
