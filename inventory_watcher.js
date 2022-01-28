@@ -127,6 +127,7 @@ function read_character_inventories(error, response, body, watcher_instance) {
     let JSON_response = JSON.parse(body).Response;
 
     if(JSON_response == undefined || JSON_response.characters == undefined) {
+        console.log(JSON_response);
         return;
     }
 
