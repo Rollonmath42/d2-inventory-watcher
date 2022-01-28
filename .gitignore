@@ -147,3 +147,5 @@ dist
 # Inserted by Carlos
 manifest/
 downloaded_manifest_version.json
+package.json
+package-lock.json
