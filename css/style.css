@@ -33,9 +33,14 @@ body {
 p {
 	margin: 0;
 }
+ul {
+    padding: 1em;
+	margin: 0;
+}
 #watch_list_title {
 	font-size: 1rem;
-    font-weight: normal;
+	font-weight: normal;
+	margin: 0;
 }
 .control_panel {
 	display: flex;
@@ -52,7 +57,7 @@ p {
 @media only screen and (max-width: 1450px) {
 	body {
 		flex-flow: row-reverse wrap;
-		align-items: flex-start;
+		align-items: center;
 		justify-content: space-between;
 	}
 	.item_screenshot {
