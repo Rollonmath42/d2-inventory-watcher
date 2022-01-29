@@ -222,6 +222,7 @@ function process_perk_column(perk_set, column) {
         perk_img.src = `https://bungie.net${perk.displayProperties.icon}`;
         perk_img.style.gridColumn = column + 1;
         perk_img.style.gridRow = proper_count + 1;
+        perk_img.style.webkitTransform = "scale(50%, 50%) translate(-50%, -50%)";
         perk_img.style.transform = "scale(50%, 50%) translate(-50%, -50%)";
         perk_img.info = perk;
         perk_img.title = perk.displayProperties.name + "\n" + perk.displayProperties.description;
