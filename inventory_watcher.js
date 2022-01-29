@@ -295,7 +295,7 @@ function check_if_item_matches_criteria(error, body, item, bucket, wish_list_ent
         }
     }
 
-    weapon_notification(bucket, item, found_perks, watcher_instance.discord_id);
+    weapon_notification(bucket, item, found_perks, watcher_instance.discord_id, wish_list_entry);
 }
 
 module.exports.watcher_startup = watcher_startup;

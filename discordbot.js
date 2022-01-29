@@ -139,7 +139,7 @@ async function postmaster_warning(message, user_id) {
     user.send(message);
 }
 
-async function weapon_notification(location, item, found_perks, user_id) {
+async function weapon_notification(location, item, found_perks, user_id, wish_list_entry) {
     const user = await client.users.fetch(user_id);
     const weaponMessage = new MessageEmbed()
         .setColor('LUMINOUS_VIVID_PINK')
@@ -155,10 +155,14 @@ async function weapon_notification(location, item, found_perks, user_id) {
             inner_counter--;
         }
 
-        while(inner_counter > 0 && i < keys.length - 1) {
+        while(inner_counter > 0) {
             weaponMessage.addField('\u200B', '\u200B', true);
             inner_counter--;
         }
+    }
+
+    if(wish_list_entry.title != undefined && wish_list_entry.description != undefined) {
+        weaponMessage.Message.addField("Watch List Item Title: " + wish_list_entry.title, "Watch List Item Description: " + wish_list_entry.description, true);
     }
 
     user.send({embeds: [weaponMessage]});
