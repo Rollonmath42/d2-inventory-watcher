@@ -7,6 +7,8 @@ let import_json = document.getElementById("import_json");
 let export_button = document.getElementById("export_button");
 let export_name = document.getElementById("export_name");
 let remove_current_button = document.getElementById("remove_current_item");
+let item_title_box = document.getElementById("item_title");
+let item_description_box = document.getElementById("item_description");
 
 let background_watch_list = [];
 let weapon_and_perk_db;
@@ -18,6 +20,34 @@ export_button.addEventListener("click", download_watch_list);
 remove_current_button.addEventListener("click", remove_current_item);
 import_json.addEventListener("click", () => { import_json.value = null });
 import_json.addEventListener("change", load_wish_list);
+item_title_box.addEventListener("input", update_title_field);
+item_description_box.addEventListener("input", update_description_field);
+
+function update_title_field() {
+    if(item_screenshot.index == -1) {
+        return;
+    }
+
+    for(let i = 0; i < background_watch_list.length; i++) {
+        if(background_watch_list[i].watch_list_index == item_screenshot.index) {
+            background_watch_list[i].title = item_title_box.value;
+            break;
+        }
+    }
+}
+
+function update_description_field() {
+    if(item_screenshot.index == -1) {
+        return;
+    }
+
+    for(let i = 0; i < background_watch_list.length; i++) {
+        if(background_watch_list[i].watch_list_index == item_screenshot.index) {
+            background_watch_list[i].description = item_description_box.value;
+            break;
+        }
+    }
+}
 
 function load_wish_list() {
     if(import_json.files.item(0) == undefined) {
@@ -42,6 +72,12 @@ function set_wish_list(event) {
     item_screenshot.src = "./no_item.jpg";
     item_screenshot.screenshot = "";
     item_screenshot.hash = 0;
+    item_screenshot.index = -1;
+
+    item_title_box.value = "";
+    item_description_box.value = "";
+    item_title_box.contentEditable = "false";
+    item_description_box.contentEditable = "false";
 
     while(perk_list.firstChild) {
         perk_list.removeChild(perk_list.lastChild);
@@ -98,6 +134,10 @@ function remove_current_item() {
     item_screenshot.screenshot = "";
     item_screenshot.hash = 0;
     item_screenshot.index = -1;
+    item_title_box.value = "";
+    item_description_box.value = "";
+    item_title_box.contentEditable = "false";
+    item_description_box.contentEditable = "false";
 }
 
 function download_watch_list() {
@@ -158,11 +198,23 @@ function display_item(item, from_watch_list, watch_list_unique_index) {
     item_screenshot.src = "https://www.bungie.net" + item.screenshot;
     item_screenshot.screenshot = item.screenshot;
     item_screenshot.hash = item.hash;
+    item_title_box.value = "";
+    item_description_box.value = "";
+    item_title_box.contentEditable = "true";
+    item_description_box.contentEditable = "true";
 
     httpGetAsync(`/weapon/${item.hash}`, display_perks);
 
     if(from_watch_list) {
         item_screenshot.index = watch_list_unique_index;
+        
+        for(let i = 0; i < background_watch_list.length; i++) {
+            if(background_watch_list[i].watch_list_index == item_screenshot.index) {
+                item_title_box.value = background_watch_list[i].title;
+                item_description_box.value = background_watch_list[i].description;
+                break;
+            }
+        }
         return;
     }
     
@@ -181,6 +233,8 @@ function display_item(item, from_watch_list, watch_list_unique_index) {
     background_watch_list.push({
         watch_list_index : watch_item.index,
         gun_id : item.hash,
+        description : "",
+        title : "",
         perk_combo : [
             {
                 perk_ids : []
@@ -223,9 +277,6 @@ function process_perk_column(perk_set, column) {
         perk_img.className = "perk_icon";
         perk_img.style.gridColumn = column + 1;
         perk_img.style.gridRow = proper_count + 1;
-        //perk_img.style.display = "inline-block";
-        //perk_img.style.webkitTransform = "scale(50%, 50%) translate(-50%, -50%)";
-        //perk_img.style.transform = "scale(50%, 50%) translate(-50%, -50%)";
         perk_img.info = perk;
         perk_img.title = perk.displayProperties.name + "\n" + perk.displayProperties.description;
         perk_img.addEventListener("click", () => {
