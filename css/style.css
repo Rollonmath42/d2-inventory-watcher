@@ -45,8 +45,8 @@ p {
 }
 .perk_icon {
 	display: inline-block;
-	-webkit-transform: scale(50%, 50%) translate(-50%, -50%);
-	transform: scale(50%, 50%) translate(-50%, -50%);
+	-webkit-transform: scale(0.5, 0.5) translate(-50%, -50%);
+	transform: scale(0.5, 0.5) translate(-50%, -50%);
 }
 
 @media only screen and (max-width: 1450px) {
