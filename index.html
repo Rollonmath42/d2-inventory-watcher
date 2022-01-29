@@ -19,13 +19,17 @@
     </div>
     <button id="remove_current_item">Remove Current Item</button>
   </div>
-  <div id="watch_list_container">
+  <div id="watch_list_container" class="watch_list_container">
     <h1 id="watch_list_title">Watch List</h1>
     <ul id="watch_list" class="watch_list"></ul>
   </div>
   <div id="search_section" class="search_section">
     <input type="text" id="search_box" placeholder="Search...">
     <ul id="search_results"></ul>
+  </div>
+  <div id="notes_section" class="notes_section">
+    <input type="text" id="item_title" placeholder="Title for item">
+    <textarea id="item_description" placeholder="Description for item" rows="5" cols="25"></textarea>
   </div>
   <script src="js/index.js"></script>
 </body>
