@@ -36,28 +36,6 @@ class inventory_watcher_class {
 /////////////////////////////////////////
 //This section includes information that can be fed into the program; user based info.
 
-const its_me = {
-    membership: "3",
-    profile_id: "4611686018468393987",
-    postmaster: {
-        "2305843009394751671" : {
-            first_postmaster_notify: false,
-            second_postmaster_notify: false,
-            count: 0
-        },
-        "2305843009432475159" : {
-            first_postmaster_notify: false,
-            second_postmaster_notify: false,
-            count: 0
-        },
-        "2305843009764984617" : {
-            first_postmaster_notify: false,
-            second_postmaster_notify: false,
-            count: 0
-        }
-    }
-}
-
 let discord_id;
 
 /////////////////////////////////////////
@@ -176,29 +154,28 @@ function process_items(items, is_character, character, location, watcher_instanc
 
 
     for(let i = 0; i < items.length; i++) {
+        if(is_character) {
+            if(items[i].bucketHash == 215593132) {
+                watcher_instance.bungie_profile.postmaster[character.characterId].count++;
+            }
+
+            if(watcher_instance.bungie_profile.postmaster[character.characterId].count > 15 && !watcher_instance.bungie_profile.postmaster[character.characterId].first_postmaster_notify) {
+                watcher_instance.bungie_profile.postmaster[character.characterId].first_postmaster_notify = true;
+                postmaster_message(`Your ${class_name}'s postmaster is entering a danger zone!`, watcher_instance.discord_id);
+            }
+        
+            if(watcher_instance.bungie_profile.postmaster[character.characterId].count > 18 && !watcher_instance.bungie_profile.postmaster[character.characterId].second_postmaster_notify) {
+                watcher_instance.bungie_profile.postmaster[character.characterId].second_postmaster_notify = true;
+                postmaster_message(`Your ${class_name}'s postmaster is in critical state! Transfer items out of there as soon as possible, or else you may start losing items!`, watcher_instance.discord_id);
+            }
+        }
+
         if(items[i].itemInstanceId == undefined) {
             continue;
         }
 
         if(!weapon_buckets.includes(items[i].bucketHash)) {
             continue;
-        }
-
-        //Postmaster check
-        if(is_character) {
-            if(items[i].bucketHash == 215593132) {
-                watcher_instance.bungie_profile.postmaster[character.characterId].count++;
-            }
-    
-            if(watcher_instance.bungie_profile.postmaster[character.characterId].count > 15 && !watcher_instance.bungie_profile.postmaster[character.characterId].first_postmaster_notify) {
-                watcher_instance.bungie_profile.postmaster[character.characterId].first_postmaster_notify = true;
-                postmaster_notification(`Your ${class_name}'s postmaster is entering a danger zone!`, discord_id);
-            }
-    
-            if(watcher_instance.bungie_profile.postmaster[character.characterId].count > 18 && !watcher_instance.bungie_profile.postmaster[character.characterId].second_postmaster_notify) {
-                watcher_instance.bungie_profile.postmaster[character.characterId].second_postmaster_notify = true;
-                postmaster_notification(`Your ${class_name}'s postmaster is in critical state! Transfer items out of there as soon as possible, or else you may start losing items!`, discord_id);
-            }
         }
 
         if(watcher_instance.seen_items.includes(items[i].itemInstanceId)) {

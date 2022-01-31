@@ -11,7 +11,8 @@ const inventory_watcher = require("./inventory_watcher");
 let watcher_dictionary = {};
 
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_PRESENCES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });
+//const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_PRESENCES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });RESET BEFORE PUSHING
+const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });
 
 // When the client is ready, run this code (only once)
 client.once("ready", () => {
@@ -131,17 +132,17 @@ async function simple_message(message, user_id) {
 
 async function postmaster_warning(message, user_id) {
     const user = await client.users.fetch(user_id);
-    const weaponMessage = new MessageEmbed()
+    const postmaster_message = new MessageEmbed()
         .setColor('RED')
         .setTitle('Postmaster Warning!')
         .setDescription(message)
         .setThumbnail("https://www.bungie.net/common/destiny2_content/icons/58e0868540ff4053d1a1f10f2dd959dd.png");
-    user.send(message);
+    user.send({embeds: [postmaster_message]});
 }
 
 async function weapon_notification(location, item, found_perks, user_id, wish_list_entry) {
     const user = await client.users.fetch(user_id);
-    const weaponMessage = new MessageEmbed()
+    const weapon_message = new MessageEmbed()
         .setColor('LUMINOUS_VIVID_PINK')
         .setTitle('New Weapon Notification!')
         .setDescription(`A weapon located in your ${location} matches a listing on your watch list!`)
@@ -151,21 +152,21 @@ async function weapon_notification(location, item, found_perks, user_id, wish_li
     for(let i = 0; i < keys.length; i++) {
         let inner_counter = 3;
         for(let j = 0; j < found_perks[keys[i]].length; j++) {
-            weaponMessage.addField(found_perks[keys[i]][j].name, found_perks[keys[i]][j].description, true);
+            weapon_message.addField(found_perks[keys[i]][j].name, found_perks[keys[i]][j].description, true);
             inner_counter--;
         }
 
         while(inner_counter > 0) {
-            weaponMessage.addField('\u200B', '\u200B', true);
+            weapon_message.addField('\u200B', '\u200B', true);
             inner_counter--;
         }
     }
 
     if(wish_list_entry.title != undefined && wish_list_entry.description != undefined) {
-        weaponMessage.addField("Watch List Item Title: " + wish_list_entry.title, "Watch List Item Description: " + wish_list_entry.description, false);
+        weapon_message.addField("Watch List Item Title: " + wish_list_entry.title, "Watch List Item Description: " + wish_list_entry.description, false);
     }
 
-    user.send({embeds: [weaponMessage]});
+    user.send({embeds: [weapon_message]});
 }
 
 // Login to Discord with your client's token
