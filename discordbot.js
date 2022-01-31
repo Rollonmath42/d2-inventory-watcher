@@ -162,7 +162,7 @@ async function weapon_notification(location, item, found_perks, user_id, wish_li
     }
 
     if(wish_list_entry.title != undefined && wish_list_entry.description != undefined) {
-        weaponMessage.Message.addField("Watch List Item Title: " + wish_list_entry.title, "Watch List Item Description: " + wish_list_entry.description, true);
+        weaponMessage.addField("Watch List Item Title: " + wish_list_entry.title, "Watch List Item Description: " + wish_list_entry.description, false);
     }
 
     user.send({embeds: [weaponMessage]});
