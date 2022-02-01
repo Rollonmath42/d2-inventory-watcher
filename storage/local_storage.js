@@ -26,7 +26,7 @@ const write_db = (() => {
         if(error) {
             throw error;
         }
-        
+
         console.log("Saved DB");
     });
 }).bind(this);
@@ -42,7 +42,7 @@ function read_db(callback) {
             }
         }
 
-        db = !error ? JSON.parse(data) : [];
+        db = !error ? JSON.parse(data) : db;
         callback(db);
     });
 }
