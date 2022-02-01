@@ -102,7 +102,8 @@ function watcher_loop(watcher_instance) {
 
 function read_character_inventories(error, response, body, watcher_instance) {
     if(error) {
-        throw error;
+        console.log(error);
+	return;
     }
 
     let JSON_response = JSON.parse(body).Response;
