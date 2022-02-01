@@ -133,6 +133,12 @@ function read_character_inventories(error, response, body, watcher_instance) {
 
     //Individual Character Inventory and Postmaster Check - these should happen every time
     let character_inventories = JSON_response.characterInventories.data;
+    
+    if(character_inventories == undefined) {
+	    console.log("huh, weird... " + character_inventories);
+	    return;
+    }
+
     let keys = Object.keys(character_inventories);
     for(let i = 0; i < keys.length; i++) {
         let items = character_inventories[keys[i]].items;
