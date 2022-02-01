@@ -1,14 +1,16 @@
 // Require the necessary discord.js classes
 const { Client, Intents, Guild, Interaction, Message, MessageEmbed } = require("discord.js");
 const request = require('request');
-const { check_manifest } = require("./get_manifest_and_build");
 require("dotenv").config();
 
 const bungie_base_url = "https://www.bungie.net";
 const api_headers = {"X-API-Key" : process.env.API_KEY};
 
 const inventory_watcher = require("./inventory_watcher");
+const local_database = require("./storage/local_storage");
+const { initParams } = require("request");
 let watcher_dictionary = {};
+let setup_complete = false;
 
 // Create a new client instance
 //const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_PRESENCES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });RESET BEFORE PUSHING
@@ -17,12 +19,17 @@ const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES], partials: 
 // When the client is ready, run this code (only once)
 client.once("ready", () => {
     console.log("Discord Bot active!");
-    client.user.setPresence({activities: [{name: "your inventory", type: "Stalking"}], status:"online"});
-    inventory_watcher.watcher_startup(postmaster_warning, weapon_notification);
+    client.user.setPresence({activities: [{name: "your inventory", type: "Watching"}], status:"online"});
+    inventory_watcher.watcher_startup(postmaster_warning, weapon_notification, inventory_watcher_ready);
 });
 
 client.on("messageCreate", (message) => {
     if(message.author.bot) {
+        return;
+    }
+
+    if(!setup_complete) {
+        simple_message("Hold on, still getting ready...", message.author.id);
         return;
     }
 
@@ -43,6 +50,27 @@ client.on("messageCreate", (message) => {
         });
     }
 });
+
+function inventory_watcher_ready() {
+    local_database.initialize_db(db_initialized);
+}
+
+function db_initialized(database) {
+    let keys = Object.keys(database);
+    for(let i = 0; i < keys.length; i++) {
+        watcher_dictionary[database[keys[i]].discord_id] = {
+            discord_id: database[keys[i]].discord_id,
+            bungie_profile: database[keys[i]].bungie_profile,
+            watcher: undefined,
+            watch_list: database[keys[i]].watch_list
+        };
+
+        check_watcher_definition(database[keys[i]].discord_id);
+    }
+
+    console.log("Setup complete, watchers have been deployed (if any).");
+    setup_complete = true;
+}
 
 async function process_character_info(message, body, bungie_id) {
     let response = JSON.parse(body);
@@ -71,16 +99,19 @@ async function process_character_info(message, body, bungie_id) {
 
     if(watcher_dictionary[message.author.id] == undefined) {
         watcher_dictionary[message.author.id] = {
+            discord_id: message.author.id,
             bungie_profile: bungie_profile,
             watcher: undefined,
             watch_list: undefined
         };
 
+        local_database.add_to_db(watcher_dictionary[message.author.id]);
         simple_message("Successfully registered that Bungie ID", message.author.id);
         return;
     }
 
     watcher_dictionary[message.author.id].bungie_profile = bungie_profile;
+    local_database.add_to_db(watcher_dictionary[message.author.id]);
     simple_message("Successfully registered that Bungie ID", message.author.id);
     check_watcher_definition(message.author.id);
 }
@@ -88,10 +119,13 @@ async function process_character_info(message, body, bungie_id) {
 async function handle_user_message(message) {
     if(watcher_dictionary[message.author.id] == undefined) {
         watcher_dictionary[message.author.id] = {
+            discord_id: message.author.id,
             bungie_profile: undefined,
             watcher: undefined,
             watch_list: undefined
         };
+
+        local_database.add_to_db(watcher_dictionary[message.author.id]);
     }
 
     request({ url: message.attachments.at(0).attachment }, (error, response, body) => {
@@ -100,6 +134,7 @@ async function handle_user_message(message) {
         }
 
         watcher_dictionary[message.author.id].watch_list = JSON.parse(body);
+        local_database.add_to_db(watcher_dictionary[message.author.id]);
         simple_message("Successfully added that watch list", message.author.id);
         check_watcher_definition(message.author.id);
     });
@@ -116,12 +151,14 @@ function check_watcher_definition(user_id) {
             new inventory_watcher.inventory_watcher_class(watcher_dictionary[user_id].watch_list, user_id, watcher_dictionary[user_id].bungie_profile);
         watcher_dictionary[user_id].watcher.start_watcher_loop(watcher_dictionary[user_id].watcher);
 
+        local_database.add_to_db(watcher_dictionary[user_id]);
         simple_message("Initializing watcher", user_id);
         return;
     }
 
     watcher_dictionary[user_id].watcher.update_watch_list(watcher_dictionary[user_id].watch_list);
     watcher_dictionary[user_id].watcher.update_bungie_profile(watcher_dictionary[user_id].bungie_profile);
+    local_database.add_to_db(watcher_dictionary[user_id]);
     simple_message("Updated watcher information", user_id);
 }
 

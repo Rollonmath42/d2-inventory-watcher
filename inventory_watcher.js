@@ -79,15 +79,18 @@ const bucket_dictionary = {
 
 var postmaster_message;
 var weapon_notification;
+var bot_initialized_callback;
 
-function watcher_startup(discord_postmaster_notification, discord_weapon_notification) {
+function watcher_startup(discord_postmaster_notification, discord_weapon_notification, discord_bot_initialized_callback) {
     postmaster_message = discord_postmaster_notification;
     weapon_notification = discord_weapon_notification;
+    bot_initialized_callback = discord_bot_initialized_callback;
     manifest.check_manifest(watcher_runtime);
 }
 
 function watcher_runtime() {
     console.log("Inventory Watcher has been initialized!");
+    bot_initialized_callback();
 }
 
 function watcher_loop(watcher_instance) {
