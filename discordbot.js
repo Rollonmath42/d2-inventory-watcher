@@ -8,12 +8,12 @@ const api_headers = {"X-API-Key" : process.env.API_KEY};
 
 const inventory_watcher = require("./inventory_watcher");
 const local_database = require("./storage/local_storage");
-const { initParams } = require("request");
+
 let watcher_dictionary = {};
 let setup_complete = false;
 
 // Create a new client instance
-//const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_PRESENCES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });RESET BEFORE PUSHING
+//const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_PRESENCES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });
 const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });
 
 // When the client is ready, run this code (only once)
