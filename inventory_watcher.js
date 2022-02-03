@@ -142,8 +142,13 @@ function read_character_inventories(error, response, body, watcher_instance) {
     for(let i = 0; i < keys.length; i++) {
         if(watcher_instance.bungie_profile.postmaster[keys[i]].count < 15) {
             watcher_instance.bungie_profile.postmaster[keys[i]].first_postmaster_notify = false;
+        }
+
+        if(watcher_instance.bungie_profile.postmaster[keys[i]].count < 18) {
             watcher_instance.bungie_profile.postmaster[keys[i]].second_postmaster_notify = false;
         }
+
+        watcher_instance.bungie_profile.postmaster[keys[i]].count = 0;
     }
 }
 
@@ -151,7 +156,6 @@ function process_items(items, is_character, character, location, watcher_instanc
     let class_name = "undefined name";
     let current_item_location = location;
     if(is_character) {
-        watcher_instance.bungie_profile.postmaster[character.characterId].count = 0;
         class_name = class_ids[character.classType];
     }
 
@@ -162,12 +166,12 @@ function process_items(items, is_character, character, location, watcher_instanc
                 watcher_instance.bungie_profile.postmaster[character.characterId].count++;
             }
 
-            if(watcher_instance.bungie_profile.postmaster[character.characterId].count > 15 && !watcher_instance.bungie_profile.postmaster[character.characterId].first_postmaster_notify) {
+            if(watcher_instance.bungie_profile.postmaster[character.characterId].count >= 15 && !watcher_instance.bungie_profile.postmaster[character.characterId].first_postmaster_notify) {
                 watcher_instance.bungie_profile.postmaster[character.characterId].first_postmaster_notify = true;
                 postmaster_message(`Your ${class_name}'s postmaster is entering a danger zone!`, watcher_instance.discord_id);
             }
         
-            if(watcher_instance.bungie_profile.postmaster[character.characterId].count > 18 && !watcher_instance.bungie_profile.postmaster[character.characterId].second_postmaster_notify) {
+            if(watcher_instance.bungie_profile.postmaster[character.characterId].count >= 18 && !watcher_instance.bungie_profile.postmaster[character.characterId].second_postmaster_notify) {
                 watcher_instance.bungie_profile.postmaster[character.characterId].second_postmaster_notify = true;
                 postmaster_message(`Your ${class_name}'s postmaster is in critical state! Transfer items out of there as soon as possible, or else you may start losing items!`, watcher_instance.discord_id);
             }
