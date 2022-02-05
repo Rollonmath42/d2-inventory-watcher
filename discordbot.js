@@ -93,7 +93,8 @@ async function process_character_info(message, body, bungie_id) {
         bungie_profile.postmaster[keys[i]] = {
             first_postmaster_notify: false,
             second_postmaster_notify: false,
-            count: 0
+            count: 0,
+            watch_count: 0
         };
     }
 

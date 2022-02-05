@@ -3,7 +3,8 @@ const request = require('request');
 require('dotenv').config();
 
 const bungie_base_url = "https://www.bungie.net";
-const api_headers = {"X-API-Key" : process.env.API_KEY};
+const api_headers = {"X-API-Key" : process.env.API_KEY,
+    "User-Agent" : "Rollon's Inventory Watcher/1.0 AppId/43702 (+www.rollonsd2tools.com/rollonmath42@gmail.com)"};
 
 'use strict';
 class inventory_watcher_class {
@@ -94,7 +95,7 @@ function watcher_runtime() {
 }
 
 function watcher_loop(watcher_instance) {
-    request({ url: bungie_base_url + `/Platform/Destiny2/${watcher_instance.bungie_profile.membership}/Profile/${watcher_instance.bungie_profile.profile_id}/?components=CharacterInventories,Characters,ProfileInventories,CharacterEquipment`,
+    request({ url: bungie_base_url + `/Platform/Destiny2/${watcher_instance.bungie_profile.membership}/Profile/${watcher_instance.bungie_profile.profile_id}/?components=CharacterInventories,Characters,ProfileInventories,CharacterEquipment`,///`,
         headers: api_headers}, (error, response, body) => {
             read_character_inventories(error, response, body, watcher_instance);
     });
@@ -102,8 +103,9 @@ function watcher_loop(watcher_instance) {
 
 function read_character_inventories(error, response, body, watcher_instance) {
     if(error) {
+        console.log("error on read char inventories");
         console.log(error);
-	return;
+	    return;
     }
 
     let JSON_response = JSON.parse(body).Response;
@@ -147,15 +149,16 @@ function read_character_inventories(error, response, body, watcher_instance) {
     }
 
     for(let i = 0; i < keys.length; i++) {
-        if(watcher_instance.bungie_profile.postmaster[keys[i]].count < 15) {
-            watcher_instance.bungie_profile.postmaster[keys[i]].first_postmaster_notify = false;
+        if(watcher_instance.bungie_profile.postmaster[keys[i]].watch_count == 12) {
+            watcher_instance.bungie_profile.postmaster[keys[i]].watch_count = 0;
+            if(watcher_instance.bungie_profile.postmaster[keys[i]].count < 15) {
+                watcher_instance.bungie_profile.postmaster[keys[i]].first_postmaster_notify = false;
+            }
+    
+            if(watcher_instance.bungie_profile.postmaster[keys[i]].count < 18) {
+                watcher_instance.bungie_profile.postmaster[keys[i]].second_postmaster_notify = false;
+            }
         }
-
-        if(watcher_instance.bungie_profile.postmaster[keys[i]].count < 18) {
-            watcher_instance.bungie_profile.postmaster[keys[i]].second_postmaster_notify = false;
-        }
-
-        watcher_instance.bungie_profile.postmaster[keys[i]].count = 0;
     }
 }
 
@@ -164,11 +167,21 @@ function process_items(items, is_character, character, location, watcher_instanc
     let current_item_location = location;
     if(is_character) {
         class_name = class_ids[character.classType];
+
+        if(watcher_instance.bungie_profile.postmaster[character.characterId].watch_count == undefined) {
+            watcher_instance.bungie_profile.postmaster[character.characterId].watch_count = 0;
+        }
+
+        watcher_instance.bungie_profile.postmaster[character.characterId].watch_count++;
+
+        if(watcher_instance.bungie_profile.postmaster[character.characterId].watch_count == 12) {
+            watcher_instance.bungie_profile.postmaster[character.characterId].count = 0;
+        }
     }
 
 
     for(let i = 0; i < items.length; i++) {
-        if(is_character) {
+        if(is_character && watcher_instance.bungie_profile.postmaster[character.characterId].watch_count == 12) {
             if(items[i].bucketHash == 215593132) {
                 watcher_instance.bungie_profile.postmaster[character.characterId].count++;
             }
