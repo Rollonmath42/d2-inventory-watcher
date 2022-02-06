@@ -131,10 +131,18 @@ async function handle_user_message(message) {
 
     request({ url: message.attachments.at(0).attachment }, (error, response, body) => {
         if(error) {
-            throw error;
+	    console.log("had a problem getting attachment from discord");
+            return;
         }
-
-        watcher_dictionary[message.author.id].watch_list = JSON.parse(body);
+	
+	try {
+	    watcher_dictionary[message.author.id].watch_list = JSON.parse(body);	
+	}
+	catch(new_error) {
+	    console.log("that wasn't a nice attachment");
+	    return;
+	}
+        //watcher_dictionary[message.author.id].watch_list = JSON.parse(body);
         local_database.add_to_db(watcher_dictionary[message.author.id]);
         simple_message("Successfully added that watch list", message.author.id);
         check_watcher_definition(message.author.id);

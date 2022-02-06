@@ -108,7 +108,23 @@ function read_character_inventories(error, response, body, watcher_instance) {
 	    return;
     }
 
-    let JSON_response = JSON.parse(body).Response;
+    let JSON_body = undefined;
+    try {
+	JSON_body = JSON.parse(body)
+    }
+    catch(read_char_error) {
+	console.log("hmm: " + read_char_error);
+	return;
+    }
+
+    if(JSON_body == undefined || JSON_body.Response == undefined) {
+	console.log("why u die on me?");
+	console.log(error);
+	console.log(body);
+	return;
+    }
+
+    let JSON_response = JSON_body.Response;
 
     if(JSON_response == undefined || JSON_response.characters == undefined) {
         console.log(JSON_response);
