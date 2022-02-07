@@ -150,3 +150,5 @@ downloaded_manifest_version.json
 package.json
 package-lock.json
 storage/local_db.json
+test.js
+test.js

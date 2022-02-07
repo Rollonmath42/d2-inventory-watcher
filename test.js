@@ -1,7 +1,5 @@
-const manifest = require("./get_manifest_and_build");
+const testString = "hello";
 
-manifest.check_manifest(runtime);
+let splitString = testString.split(" ");
 
-function runtime() {
-    console.log(JSON.parse(manifest.hash_lookup("DestinyInventoryItemDefinition", 3513791699).json));
-}
+console.log(testString[0]);

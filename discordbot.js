@@ -8,18 +8,18 @@ const api_headers = {"X-API-Key" : process.env.API_KEY};
 
 const inventory_watcher = require("./inventory_watcher");
 const local_database = require("./storage/local_storage");
+const discord_commands = require("./discord_commands/index");
+const { ActivityTypes } = require("discord.js/typings/enums");
 
 let watcher_dictionary = {};
 let setup_complete = false;
 
-// Create a new client instance
-//const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.GUILD_PRESENCES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });
 const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES], partials: ['MESSAGE', 'CHANNEL', 'USER'] });
 
 // When the client is ready, run this code (only once)
 client.once("ready", () => {
     console.log("Discord Bot active!");
-    client.user.setPresence({activities: [{name: "your inventory", type: "Watching"}], status:"online"});
+    client.user.setPresence({activities: [{name: "your inventory", type: ActivityTypes.WATCHING }], status:"online"});
     inventory_watcher.watcher_startup(postmaster_warning, weapon_notification, inventory_watcher_ready);
 });
 
@@ -35,6 +35,14 @@ client.on("messageCreate", (message) => {
 
     if(message.attachments.size == 1) {
         handle_user_message(message);
+    }
+
+    if(message.content[0] == "!") {
+        let argument_list = message.content.split(" ");
+        let base_command = argument_list[0].substring(1);
+        if(discord_commands.commands[base_command] != undefined) {
+            discord_commands.commands[base_command].execute(argument_list);
+        }
     }
 
     if(message.content.includes("/")) {
