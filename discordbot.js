@@ -9,7 +9,7 @@ const api_headers = {"X-API-Key" : process.env.API_KEY};
 const inventory_watcher = require("./inventory_watcher");
 const local_database = require("./storage/local_storage");
 const discord_commands = require("./discord_commands/index");
-const { ActivityTypes } = require("discord.js/typings/enums");
+//const { ActivityTypes } = require("discord.js/typings/enums");
 
 let watcher_dictionary = {};
 let setup_complete = false;
@@ -19,7 +19,7 @@ const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES], partials: 
 // When the client is ready, run this code (only once)
 client.once("ready", () => {
     console.log("Discord Bot active!");
-    client.user.setPresence({activities: [{name: "your inventory", type: ActivityTypes.WATCHING }], status:"online"});
+    client.user.setPresence({status:"online"});
     inventory_watcher.watcher_startup(postmaster_warning, weapon_notification, inventory_watcher_ready);
 });
 

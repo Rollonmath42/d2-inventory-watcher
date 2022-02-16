@@ -137,11 +137,17 @@ function read_character_inventories(error, response, body, watcher_instance) {
         watcher_instance.first_watch = false;
 
         //Vault Check - this should only be done on load
+	if(JSON_response.profileInventory.data == undefined) {
+		return;
+	}
         let profile_inventory = JSON_response.profileInventory.data.items;
         process_items(profile_inventory, false, undefined, "Vault", watcher_instance);
 
         //Current Equipment Check - this should only be done on load... could see why to do it on every run though
         let character_equipment = JSON_response.characterEquipment.data;
+	if(character_equipment == undefined) {
+		return;
+	}
     
         let keys = Object.keys(character_equipment);
         for(let i = 0; i < keys.length; i++) {
