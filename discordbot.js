@@ -41,7 +41,7 @@ client.on("messageCreate", (message) => {
         let argument_list = message.content.split(" ");
         let base_command = argument_list[0].substring(1);
         if(discord_commands.commands[base_command] != undefined) {
-            discord_commands.commands[base_command].execute(argument_list);
+            discord_commands.commands[base_command].execute(argument_list, message.author.id, handle_command_callback);
         }
     }
 
@@ -58,6 +58,19 @@ client.on("messageCreate", (message) => {
         });
     }
 });
+
+function handle_command_callback(author_id, data) {
+    if(watcher_dictionary[author_id].discord_settings == undefined) {
+        watcher_dictionary[author_id].discord_settings = {};
+    }
+
+    let keys = Object.keys(data);
+    for(let i = 0; i < keys.length; i++) {
+        watcher_dictionary[author_id].discord_settings[keys[i]] = data[keys[i]];
+    }
+
+    local_database.add_to_db(watcher_dictionary[author_id]);
+}
 
 function inventory_watcher_ready() {
     local_database.initialize_db(db_initialized);

@@ -267,6 +267,7 @@ function process_perk_column(perk_set, column) {
         if(!perk_set[i].currentlyCanRoll) {
             continue;
         }
+        console.log(perk_set[i].plugItemHash);
         let perk = weapon_and_perk_db.find(perk => perk.hash == perk_set[i].plugItemHash);
         if(perk == undefined) {
             console.log("Hey, if you see this, DM Rollon#1111 on Discord this: " + perk_set[i].plugItemHash);

@@ -72,9 +72,13 @@ function get_random_perks(id) {
 
     for(let i = 0; i < weapon.sockets.socketEntries.length; i++) {
         if(weapon.sockets.socketEntries[i].plugSources != 2) {
-            continue
+            continue;
         }
 
+        if(weapon.sockets.socketEntries[i].randomizedPlugSetHash == undefined) {
+            continue;
+        }
+        
         let plug_set = JSON.parse(manifest.hash_lookup("DestinyPlugSetDefinition", weapon.sockets.socketEntries[i].randomizedPlugSetHash).json);
 
         weapon_perks.push(plug_set.reusablePlugItems);
