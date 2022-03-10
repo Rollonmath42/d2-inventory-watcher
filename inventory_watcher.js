@@ -8,12 +8,12 @@ const api_headers = {"X-API-Key" : process.env.API_KEY,
 
 'use strict';
 class inventory_watcher_class {
-    constructor(watch_list, discord_id, bungie_profile) {
+    constructor(watch_list, discord_id, bungie_profile, seen_items) {
         this.watch_list = watch_list;
         this.discord_id = discord_id;
         this.bungie_profile = bungie_profile;
         this.first_watch = true;
-        this.seen_items = [];
+        this.seen_items = seen_items;
     }
 
     start_watcher_loop = (function(instance) {
@@ -76,11 +76,13 @@ const bucket_dictionary = {
 var postmaster_message;
 var weapon_notification;
 var bot_initialized_callback;
+var update_seen_items;
 
-function watcher_startup(discord_postmaster_notification, discord_weapon_notification, discord_bot_initialized_callback) {
+function watcher_startup(discord_postmaster_notification, discord_weapon_notification, discord_bot_initialized_callback, discord_update_seen_items) {
     postmaster_message = discord_postmaster_notification;
     weapon_notification = discord_weapon_notification;
     bot_initialized_callback = discord_bot_initialized_callback;
+    update_seen_items = discord_update_seen_items;
     manifest.check_manifest(watcher_runtime);
 }
 
@@ -106,10 +108,15 @@ function read_character_inventories(error, response, body, watcher_instance) {
     let JSON_body = undefined;
     try {
 	    JSON_body = JSON.parse(body)
-        }
+    }
     catch(read_char_error) {
 	    console.log("hmm: " + read_char_error);
 	    return;
+    }
+
+    if(JSON_body.ErrorCode != undefined && JSON_body.ErrorCode != 1) {
+        console.log("something's up on the request... maintenence?");
+        return;
     }
 
     if(JSON_body == undefined || JSON_body.Response == undefined) {
@@ -127,6 +134,11 @@ function read_character_inventories(error, response, body, watcher_instance) {
     }
 
     let character_information = JSON_response.characters.data;
+    if(character_information == undefined) {
+        console.log("character_information isn't defined for the following watcher");
+        console.log(watcher_instance);
+	    return;
+    }
 
     if(watcher_instance.first_watch) {
         watcher_instance.first_watch = false;
@@ -227,6 +239,7 @@ function process_items(items, is_character, character, location, watcher_instanc
         }
 
         watcher_instance.seen_items.push(items[i].itemInstanceId);
+        update_seen_items(watcher_instance.seen_items, watcher_instance.discord_id);
 
         let items_of_interest = watcher_instance.watch_list.filter(entry => entry.gun_id == items[i].itemHash);
 

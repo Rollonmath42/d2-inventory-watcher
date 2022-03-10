@@ -20,7 +20,7 @@ const client = new Client({ intents: [Intents.FLAGS.DIRECT_MESSAGES], partials: 
 client.once("ready", () => {
     console.log("Discord Bot active!");
     client.user.setPresence({status:"online"});
-    inventory_watcher.watcher_startup(postmaster_warning, weapon_notification, inventory_watcher_ready);
+    inventory_watcher.watcher_startup(postmaster_warning, weapon_notification, inventory_watcher_ready, update_seen_items);
 });
 
 client.on("messageCreate", (message) => {
@@ -76,14 +76,25 @@ function inventory_watcher_ready() {
     local_database.initialize_db(db_initialized);
 }
 
+function update_seen_items(seen_items, discord_id) {
+    watcher_dictionary[discord_id].seen_items = seen_items;
+    local_database.add_to_db(watcher_dictionary[discord_id]);
+}
+
 function db_initialized(database) {
     let keys = Object.keys(database);
     for(let i = 0; i < keys.length; i++) {
+        let seen_items_array = [];
+        if(database[keys[i]].seen_items != undefined) {
+            seen_items_array = database[keys[i]].seen_items;
+        }
+
         watcher_dictionary[database[keys[i]].discord_id] = {
             discord_id: database[keys[i]].discord_id,
             bungie_profile: database[keys[i]].bungie_profile,
             watcher: undefined,
-            watch_list: database[keys[i]].watch_list
+            watch_list: database[keys[i]].watch_list,
+            seen_items: seen_items_array
         };
 
         check_watcher_definition(database[keys[i]].discord_id);
@@ -124,7 +135,8 @@ async function process_character_info(message, body, bungie_id) {
             discord_id: message.author.id,
             bungie_profile: bungie_profile,
             watcher: undefined,
-            watch_list: undefined
+            watch_list: undefined,
+            seen_items: []
         };
 
         local_database.add_to_db(watcher_dictionary[message.author.id]);
@@ -178,7 +190,7 @@ function check_watcher_definition(user_id) {
 
     if(watcher_dictionary[user_id].watcher == undefined) {
         watcher_dictionary[user_id].watcher = 
-            new inventory_watcher.inventory_watcher_class(watcher_dictionary[user_id].watch_list, user_id, watcher_dictionary[user_id].bungie_profile);
+            new inventory_watcher.inventory_watcher_class(watcher_dictionary[user_id].watch_list, user_id, watcher_dictionary[user_id].bungie_profile, watcher_dictionary[user_id].seen_items);
         watcher_dictionary[user_id].watcher.start_watcher_loop(watcher_dictionary[user_id].watcher);
 
         local_database.add_to_db(watcher_dictionary[user_id]);
