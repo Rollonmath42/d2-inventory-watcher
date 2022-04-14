@@ -23,8 +23,6 @@ Think of the inventory_watcher.js file as the actual "watcher" class that everyo
 
 As for the main discordbot.js, similar to express and how to configure the actual server, you have to configure the bot to do actions based on key states such as 'once the bot is ready' or 'one when a message is sent to the bot'. Similar to inventory_watcher.js, most of the code is utility functionality to parse the info from Bungie or from the user.
 
-One common key functionality is when users type a command with a specific character to start the command (!hi, !help). As of the last time I was working on this, I came up with a way that I liked for keeping those kinds of commands split off into their own files, which is what the message.content[0] == "!" section is doing. Since Discord has implemented slash commands, odds are it would be much better to implement any sort of command functionality through that setup... But I'm a stubborn person at times, and like doing stuff in my own way :)
-
 # webserver.js
 
 This has a dependency on weapon_db_init.js, which has a dependency on get_manifest_and_build.js
