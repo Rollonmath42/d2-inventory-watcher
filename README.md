@@ -28,3 +28,7 @@ As for the main discordbot.js, similar to express and how to configure the actua
 This has a dependency on weapon_db_init.js, which has a dependency on get_manifest_and_build.js
 
 weapon_db_init.js specifically searches through every single item defined in the manifest and sees if it matches something I want to feed back to the website as a part of it's own database in memory for accessing the various items in Destiny. It also has a specific function the website needs to use to get what the actual perk sets are for weapons, since those are mapped across two different tables in the manifest.
+
+# Extra notes
+
+Organization of this project could be improved substantially; this was something I began to work towards but have not gotten around to completing due to other priorities at this time.
